@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest #github-hosted runner
     steps: 
       - name: checkout repo code
-        uses: actions/checkout@4
+        uses: actions/checkout@3
       - run: echo "$(cat hello_world.txt)"
       
       
