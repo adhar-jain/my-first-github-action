@@ -3,12 +3,9 @@ name: hello-world
 on: push
 
 jobs:
-  hello-world-job: #naming job
-    runs-on: ubuntu-latest #github-hosted runner
+  hello-world-job:
+    runs-on: ubuntu-latest
     steps: 
       - name: checkout repo code
-        uses: actions/checkout@3
+        uses: actions/checkout@v3
       - run: echo "$(cat hello_world.txt)"
-      
-      
-    
