@@ -34,6 +34,7 @@ jobs:
       id-token: write
     environment:
       name: production
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo
@@ -57,5 +58,3 @@ jobs:
       - name: deploy
         id: depoloyment
         uses: actions/deploy-pages@v4
-      - name: set page URL
-        run: echo "PAGE_URL=${{ steps.deployment.outputs.page_url }}" >> $
