@@ -56,6 +56,6 @@ jobs:
           path: '/out'
       - name: deploy
         id: depoloyment
-        uses: actions/deploy-pages@4
+        uses: actions/deploy-pages@v4
       - name: set page URL
         run: echo "PAGE_URL=${{ steps.deployment.outputs.page_url }}" >> $
