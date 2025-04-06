@@ -1,46 +1,60 @@
-name: Deploy Angular to GitHub Pages
+name: build-test-deploy
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch: #manual wf
-    
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+on: push
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
-jobs:
-  deploy:
+jobs: 
+  build:
     runs-on: ubuntu-latest
-  
-    steps:
-      - name: Checkout code
+    steps: 
+      - name: checkout repo
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
+      - name: use node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Angular app
-        run: npm run build -- --output-path=dist --base-href=/ride-sharing-app/
-
-      - name: Upload GitHub Pages artifact
-        uses: actions/upload-artifact@v3
+          node-version: '20.x'
+      - run: npm install
+      - run: npm run build
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout repo
+        uses: actions/checkout@v4
+      - name: use node.js
+        uses: actions/setup-node@v4
         with:
-          path: ./dist
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+          node-version: '20.x'
+      - run: npm install
+      - run: npm run test
+  deploy:
+    needs: test
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: production
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+        with: 
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: use node.js        
+        uses: actions/setup-node@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: '20.x'
+      - name: configure github pages
+        uses: actions/configure-pages@v4
+        with:
+          static_site_generator: next
+      - run: npm install
+      - run: npm run build
+      - name: upload artifacts
+        uses: actions/upload-pages-artifact@v3
+        with: 
+          path: './out'
+      - name: deploy
+        id: depoloyment
+        uses: actions/deploy-pages@v4
